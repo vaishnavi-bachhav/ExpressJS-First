@@ -20,41 +20,79 @@ app.get("/api/time", (req, res) => {
 
 // Get splendid circles
 app.get("/math/circle/:r", (req, res) => {
-  let radius = req.params['r'];
+  try {
+    const radius = Number(req.params.r);
+    if (isNaN(radius)) {
+      return res.status(400).json({
+        error: "Invalid radius. Please provide a numeric value."
+      });
+    }
+    const circleArea = Math.PI * radius * radius;
+    const circleCircumference = 2 * Math.PI * radius;
+    return res.status(200).json({
+      "area": circleArea,
+      "circumference": circleCircumference
+    });
+  }
+  catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: "Something went wrong; please try again."
+    });
+  }
 
-  const circleArea = Math.PI * radius * radius;
-  const circleCircumference = Math.PI * 2 * radius;
-  res.json({
-    "area": circleArea,
-    "circumference": circleCircumference
-  });
 });
 
 // Get radical rectangles
 app.get("/math/rectangle/:width/:height", (req, res) => {
-  let width = req.params['width'];
-  let height = req.params['height'];
-  const rectArea = width * height;
-  const rectPerimeter = 2 * width + 2 * height;
-  res.json({
-    'area': rectArea,
-    'perimeter': rectPerimeter
-  });
+  try {
+    const width = Number(req.params.width);
+    const height = Number(req.params.height);
+    if (isNaN(width) || isNaN(height)) {
+      return res.status(400).json({
+        error: "Invalid width or height. Please provide numeric values."
+      });
+    }
+
+    const rectArea = width * height;
+    const rectPerimeter = 2 * width + 2 * height;
+    return res.status(200).json({
+      'area': rectArea,
+      'perimeter': rectPerimeter
+    });
+  }
+  catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: "Something went wrong; please try again."
+    });
+  }
 });
 
-// Get 
+// Get power 
 app.get('/math/power/:base/:exponent', (req, res) => {
-  let base = req.params['base'];
-  let exponent = req.params['exponent'];
-  const power = Math.pow(base, exponent);
-  const includeRoot = req.query.root === "true";
-  let response = {
-    'result': power
-  };
-  if (includeRoot == true) {
-    response.root = Math.sqrt(base);
+  try {
+    const base = Number(req.params.base);
+    const exponent = Number(req.params.exponent);
+    if (base == NaN || exponent == NaN) {
+      return res.status(400).json({ "error": "Invalid base or exponent. Please provide numeric values." });
+    }
+    const power = Math.pow(base, exponent);
+    const includeRoot = req.query.root === "true";
+    let response = {
+      'result': power
+    };
+    if (includeRoot) {
+      response.root = Math.sqrt(base);
+    }
+    return res.status(200).json(response);
   }
-  res.json(response);
+  catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: "Something went wrong; please try again."
+    });
+  }
 });
 
 app.listen(PORT, () => {
